@@ -7,37 +7,29 @@ public class Timetable {
     private final Map<DayOfWeek, TreeMap<TimeOfDay, List<TrainingSession>>> timetable = new HashMap<>();
 
     public void addNewTrainingSession(TrainingSession trainingSession) {
-        if (!this.timetable.containsKey(trainingSession.getDayOfWeek())) {
-            List<TrainingSession> list = new ArrayList<>();
-            list.add(trainingSession);
+        DayOfWeek dayOfWeek = trainingSession.getDayOfWeek();
+        TimeOfDay timeOfDay = trainingSession.getTimeOfDay();
 
-            TreeMap<TimeOfDay, List<TrainingSession>> trainingSessions = new TreeMap<>();
-
-            trainingSessions.put(trainingSession.getTimeOfDay(), list);
-
-            this.timetable.put(trainingSession.getDayOfWeek(), trainingSessions);
-        } else if (!this.timetable.get(trainingSession.getDayOfWeek()).containsKey(trainingSession.getTimeOfDay())) {
-            TreeMap<TimeOfDay, List<TrainingSession>> trainingSessions = this.timetable.get(trainingSession.getDayOfWeek());
-
-            List<TrainingSession> list = new ArrayList<>();
-
-            list.add(trainingSession);
-
-            trainingSessions.put(trainingSession.getTimeOfDay(), list);
-        } else {
-            TreeMap<TimeOfDay, List<TrainingSession>> trainingSessions = this.timetable.get(trainingSession.getDayOfWeek());
-
-            List<TrainingSession> list = trainingSessions.get(trainingSession.getTimeOfDay());
-
-            for (TrainingSession trainingSession1 : list) {
-                if (trainingSession.getCoach().equals(trainingSession1.getCoach())) {
-                    System.out.println("Тренер уже занят в это время.");
-                    return;
-                }
-            }
-
-            list.add(trainingSession);
+        TreeMap<TimeOfDay, List<TrainingSession>> trainingsForDay = timetable.get(dayOfWeek);
+        if (trainingsForDay == null) {
+            trainingsForDay = new TreeMap<>();
+            timetable.put(dayOfWeek, trainingsForDay);
         }
+
+        List<TrainingSession> trainingSessions = trainingsForDay.get(timeOfDay);
+        if (trainingSessions == null) {
+            trainingSessions = new ArrayList<>();
+            trainingsForDay.put(timeOfDay, trainingSessions);
+        }
+
+        for (TrainingSession trainingSession1 : trainingSessions) {
+            if (trainingSession.getCoach().equals(trainingSession1.getCoach())) {
+                System.out.println("Тренер уже занят в это время.");
+                return;
+            }
+        }
+
+        trainingSessions.add(trainingSession);
     }
 
     public TreeMap<TimeOfDay, List<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
@@ -67,7 +59,7 @@ public class Timetable {
             counterOfTrainings.add(counter);
         }
 
-        counterOfTrainings.sort((o1, o2) -> o2.getCountOfTrainings() - o1.getCountOfTrainings());
+        Collections.sort(counterOfTrainings);
 
         return counterOfTrainings;
     }

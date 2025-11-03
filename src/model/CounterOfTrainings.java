@@ -1,6 +1,6 @@
 package model;
 
-public class CounterOfTrainings {
+public class CounterOfTrainings implements Comparable<CounterOfTrainings>{
 
     private final Coach coach;
     private final int countOfTrainings;
@@ -16,5 +16,10 @@ public class CounterOfTrainings {
 
     public int getCountOfTrainings() {
         return countOfTrainings;
+    }
+
+    @Override
+    public int compareTo(CounterOfTrainings o) {
+        return o.countOfTrainings - this.countOfTrainings;
     }
 }
